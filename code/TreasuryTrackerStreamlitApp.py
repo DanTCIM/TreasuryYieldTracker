@@ -1,51 +1,31 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Treasury Rate Time-Series Visualization
+# # Treasury Yield Tracker
 
-# ## Introduction
-
-# The Jupyter notebook automates the process of downloading Treasury rate data and displaying the past 10-year rate time-series data with a monthly timestep over the past 12 months. It consists of sections for installing necessary libraries such as pandas, matplotlib, and yfinance, downloading the Treasury rate data using yfinance, preprocessing the data for visualization, and creating a line plot to visualize the data. The notebook fulfills the prompt "/generate I want to automatically download Treasury rate and show the past 10-yr rate time-series data using monthly timestep for the past 12-month period."
-
-# ## Requirements
-# yfinance
-
-# In[2]:
+# ## Requirements and Import
 
 import streamlit as st
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
-
+from datetime import datetime
 
 # ## Download Treasury rate data
 
-# In[3]:
-
-
-# Download Treasury rate data from Yahoo Finance for the past 12 months with monthly timestep
-#^IRX: 1-Year Eris SOFR Swap Futures,M (YIAH24.CBT)
-#^FVX five year Treasury
-#^TNX 10 year Treasury
-#^TYX 30 year Treasury
-
 treasury_rate_data = yf.download("^IRX ^FVX ^TNX ^TYX", start="2022-12-29", end=None)#, interval="1mo")
-
-
-# In[4]:
-
-
-# Display the downloaded Treasury rate data
+todays_date = datetime.now().strftime('%Y-%m-%d')
 df = treasury_rate_data["Adj Close"]
-#df.info()
-#print(df)
-
 
 # ## Visualize the data
 
-# In[6]:
 # Streamlit application starts here
 st.title('Treasury Yield Tracker')
+# Example of including a link in Streamlit
+link = "https://github.com/DanTCIM/TreasuryYieldTracker.git"
+st.write("Here is a simple way to monitor the market interest rate.")
+st.markdown(f"You can find the code in [GitHub]({link}).")
+
 
 # Plotting the data with Streamlit
 fig, ax = plt.subplots(figsize=(12, 6))
@@ -58,15 +38,13 @@ ax.set_ylabel('Yield')
 ax.legend()
 ax.grid(True)
 
-
 # Use Streamlit's method to display the figure
 st.pyplot(fig)
 
-# In[7]:
-
+st.write(f"Data source: Yahoo Finance as of {todays_date}")
 
 # Filter for quarter ends
-quarter_end_data = df.resample('M').last()
+month_end_data = df.resample('M').last()
 
 # Rename column names
 new_column_names = {'^IRX': '1-yr SOFR',
@@ -74,16 +52,17 @@ new_column_names = {'^IRX': '1-yr SOFR',
                     '^TNX': '10-yr Treasury',
                     '^TYX': '30-yr Treasury'}
 
-quarter_end_data = quarter_end_data.rename(columns = new_column_names)
+month_end_data = month_end_data.rename(columns = new_column_names)
 
 # Rerder columns
 desired_order = ['1-yr SOFR', '5-yr Treasury', '10-yr Treasury', '30-yr Treasury']
 
 # Show the filtered DataFrame
-#print(quarter_end_data[desired_order])
 # Displaying a table
-st.subheader('Monthly Table')
-st.dataframe(quarter_end_data[desired_order])  # Display the DataFrame as a table
+st.subheader('Month-End Data Table')
+st.dataframe(month_end_data[desired_order])  # Display the DataFrame as a table
+
+
 
 
 
