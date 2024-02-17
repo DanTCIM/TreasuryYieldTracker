@@ -29,7 +29,7 @@ st.markdown(f"You can find the code in [GitHub]({link}).")
 
 # Plotting the data with Streamlit
 fig, ax = plt.subplots(figsize=(12, 6))
-ax.plot(df.index, df['^IRX'], label='1-yr SOFR', color='darkblue')
+ax.plot(df.index, df['^IRX'], label='13-week T-Bill', color='darkblue')
 ax.plot(df.index, df['^FVX'], label='5-yr Treasury', color='orange')
 ax.plot(df.index, df['^TNX'], label='10-yr Treasury', color='tomato')
 ax.plot(df.index, df['^TYX'], label='30-yr Treasury', color='darkred')
@@ -47,7 +47,7 @@ st.write(f"Data source: Yahoo Finance as of {todays_date}")
 month_end_data = df.resample('M').last()
 
 # Rename column names
-new_column_names = {'^IRX': '1-yr SOFR',
+new_column_names = {'^IRX': '13-week T-Bill',
                     '^FVX': '5-yr Treasury',
                     '^TNX': '10-yr Treasury',
                     '^TYX': '30-yr Treasury'}
@@ -55,7 +55,7 @@ new_column_names = {'^IRX': '1-yr SOFR',
 month_end_data = month_end_data.rename(columns = new_column_names)
 
 # Rerder columns
-desired_order = ['1-yr SOFR', '5-yr Treasury', '10-yr Treasury', '30-yr Treasury']
+desired_order = ['13-week T-Bill', '5-yr Treasury', '10-yr Treasury', '30-yr Treasury']
 
 # Show the filtered DataFrame
 # Displaying a table
