@@ -40,9 +40,6 @@ ax.grid(True)
 # Use Streamlit's method to display the figure
 st.pyplot(fig)
 
-st.write(f"Data source: Yahoo Finance as of {todays_date}")
-st.write("Tickers: ^IRX: 13-week T-Bill, ^FVX: 5-yr Treasury, ^TNX: 10-yr Treasury, ^TYX: 30-yr Treasury")
-
 # Filter for quarter ends
 month_end_data = df.resample('M').last()
 
@@ -62,7 +59,8 @@ desired_order = ['13-week T-Bill', '5-yr Treasury', '10-yr Treasury', '30-yr Tre
 st.subheader('Month-End Data Table')
 st.dataframe(month_end_data[desired_order])  # Display the DataFrame as a table
 
-
+st.write(f"Data source: Yahoo Finance as of {todays_date}")
+st.write("Tickers: ^IRX: 13-week T-Bill, ^FVX: 5-yr Treasury, ^TNX: 10-yr Treasury, ^TYX: 30-yr Treasury")
 
 
 
