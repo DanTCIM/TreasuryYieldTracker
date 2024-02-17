@@ -41,7 +41,7 @@ ax.grid(True)
 st.pyplot(fig)
 
 st.write(f"Data source: Yahoo Finance as of {todays_date}")
-st.write("Tickers: ^IRX: 13-week T-Bill, ^FVX: '5-yr Treasury, ^TNX: '10-yr Treasury, ^TYX: 30-yr Treasury")
+st.write("Tickers: ^IRX: 13-week T-Bill, ^FVX: 5-yr Treasury, ^TNX: 10-yr Treasury, ^TYX: 30-yr Treasury")
 
 # Filter for quarter ends
 month_end_data = df.resample('M').last()
