@@ -58,6 +58,7 @@ ax.set_ylabel('Yield')
 ax.legend()
 ax.grid(True)
 
+
 # Use Streamlit's method to display the figure
 st.pyplot(fig)
 
