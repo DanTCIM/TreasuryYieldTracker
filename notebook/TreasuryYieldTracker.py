@@ -12,7 +12,7 @@
 
 # In[2]:
 
-
+import streamlit as st
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -44,20 +44,22 @@ df = treasury_rate_data["Adj Close"]
 # ## Visualize the data
 
 # In[6]:
+# Streamlit application starts here
+st.title('Treasury Yield Tracker')
 
+# Plotting the data with Streamlit
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.plot(df.index, df['^IRX'], label='1-yr SOFR', color='darkblue')
+ax.plot(df.index, df['^FVX'], label='5-yr Treasury', color='orange')
+ax.plot(df.index, df['^TNX'], label='10-yr Treasury', color='tomato')
+ax.plot(df.index, df['^TYX'], label='30-yr Treasury', color='darkred')
+ax.set.xlabel('Date')
+ax.set.ylabel('Yield')
+ax.legend()
+ax.grid(True)
 
-# Plotting the data
-plt.figure(figsize=(12, 6))
-plt.plot(df.index, df['^IRX'], label='1-yr SOFR', color='darkblue')
-plt.plot(df.index, df['^FVX'], label='5-yr Treasury', color='orange')
-plt.plot(df.index, df['^TNX'], label='10-yr Treasury', color='tomato')
-plt.plot(df.index, df['^TYX'], label='30-yr Treasury', color='darkred')
-plt.xlabel('Date')
-plt.ylabel('Yield')
-plt.legend()
-plt.grid(True)
-plt.show()
-
+# Use Streamlit's method to display the figure
+st.pyplot(fig)
 
 # In[7]:
 
@@ -77,10 +79,12 @@ quarter_end_data = quarter_end_data.rename(columns = new_column_names)
 desired_order = ['1-yr SOFR', '5-yr Treasury', '10-yr Treasury', '30-yr Treasury']
 
 # Show the filtered DataFrame
-print(quarter_end_data[desired_order])
+#print(quarter_end_data[desired_order])
+# Displaying a table
+st.subheader('Monthly Table')
+st.dataframe(quarter_end_data[desired_order])  # Display the DataFrame as a table
 
 
-# In[ ]:
 
 
 
