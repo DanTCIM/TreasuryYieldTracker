@@ -24,9 +24,8 @@ st.title('Treasury Yield Tracker')
 # Example of including a link in Streamlit
 link = "https://github.com/DanTCIM/TreasuryYieldTracker.git"
 st.write("Here is a simple way to monitor the market interest rate.")
-st.markdown(f"You can find the code in [GitHub]({link}).")
-
-
+st.markdown(f"You can find the code in [GitHub]({link}).")                    
+                    
 # Plotting the data with Streamlit
 fig, ax = plt.subplots(figsize=(12, 6))
 ax.plot(df.index, df['^IRX'], label='13-week T-Bill', color='darkblue')
@@ -42,6 +41,7 @@ ax.grid(True)
 st.pyplot(fig)
 
 st.write(f"Data source: Yahoo Finance as of {todays_date}")
+st.write("Tickers: ^IRX: 13-week T-Bill, ^FVX: '5-yr Treasury, ^TNX: '10-yr Treasury, ^TYX: 30-yr Treasury")
 
 # Filter for quarter ends
 month_end_data = df.resample('M').last()
