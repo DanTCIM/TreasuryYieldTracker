@@ -63,8 +63,14 @@ desired_order = ['Actual Date', '13-week T-Bill', '5-yr Treasury', '10-yr Treasu
 st.subheader('Month-End Data Table')
 st.dataframe(month_end_data[desired_order])  # Display the DataFrame as a table
 
+# Source
+link1 = "https://finance.yahoo.com/quote/%5EIRX/history"
+link2 = "https://finance.yahoo.com/quote/%5EFVX/history"
+link3 = "https://finance.yahoo.com/quote/%5ETNX/history"
+link4 = "https://finance.yahoo.com/quote/%5ETYX/history"
+
 st.write(f"Data source: Yahoo Finance as of {todays_date}")
-st.write("Adjusted Close from Tickers: ^IRX (13-week T-Bill), ^FVX (5-yr Treasury), ^TNX (10-yr Treasury), ^TYX (30-yr Treasury)")
+st.markdown(f"Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)")
 
 
 
