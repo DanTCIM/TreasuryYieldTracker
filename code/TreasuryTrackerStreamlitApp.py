@@ -24,7 +24,7 @@ st.title('Treasury Yield Tracker')
 # Example of including a link in Streamlit
 link = "https://github.com/DanTCIM/TreasuryYieldTracker.git"
 st.write("Here is a simple way to monitor the market interest rate.")
-st.markdown(f"You can find the code in [GitHub]({link}).")                    
+st.markdown(f"You can find the code and the documentation of the project in [GitHub]({link}).")
                     
 # Plotting the data with Streamlit
 fig, ax = plt.subplots(figsize=(12, 6))
@@ -40,7 +40,11 @@ ax.grid(True)
 # Use Streamlit's method to display the figure
 st.pyplot(fig)
 
-# Filter for quarter ends
+# Add actual date information
+df = df.copy()
+df['Actual Date'] = df.index.strftime('%Y-%m-%d')
+
+# Filter for month ends
 month_end_data = df.resample('M').last()
 
 # Rename column names
@@ -52,7 +56,7 @@ new_column_names = {'^IRX': '13-week T-Bill',
 month_end_data = month_end_data.rename(columns = new_column_names)
 
 # Rerder columns
-desired_order = ['13-week T-Bill', '5-yr Treasury', '10-yr Treasury', '30-yr Treasury']
+desired_order = ['Actual Date', '13-week T-Bill', '5-yr Treasury', '10-yr Treasury', '30-yr Treasury']
 
 # Show the filtered DataFrame
 # Displaying a table
@@ -60,7 +64,7 @@ st.subheader('Month-End Data Table')
 st.dataframe(month_end_data[desired_order])  # Display the DataFrame as a table
 
 st.write(f"Data source: Yahoo Finance as of {todays_date}")
-st.write("Tickers: ^IRX: 13-week T-Bill, ^FVX: 5-yr Treasury, ^TNX: 10-yr Treasury, ^TYX: 30-yr Treasury")
+st.write("Adjusted Close from Tickers: ^IRX (13-week T-Bill), ^FVX (5-yr Treasury), ^TNX (10-yr Treasury), ^TYX (30-yr Treasury)")
 
 
 
