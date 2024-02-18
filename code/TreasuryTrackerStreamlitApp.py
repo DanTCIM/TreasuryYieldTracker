@@ -9,12 +9,10 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime
 
 # ## Download Treasury rate data
 
 treasury_rate_data = yf.download("^IRX ^FVX ^TNX ^TYX", start="2022-12-29", end=None)#, interval="1mo")
-todays_date = datetime.now().strftime('%Y-%m-%d')
 df = treasury_rate_data["Adj Close"]
 
 # ## Visualize the data
@@ -64,13 +62,15 @@ st.subheader('Month-End Data Table')
 st.dataframe(month_end_data[desired_order])  # Display the DataFrame as a table
 
 # Source
+todays_date = df['Actual Date'].iloc[-1]
+
 link1 = "https://finance.yahoo.com/quote/%5EIRX/history"
 link2 = "https://finance.yahoo.com/quote/%5EFVX/history"
 link3 = "https://finance.yahoo.com/quote/%5ETNX/history"
 link4 = "https://finance.yahoo.com/quote/%5ETYX/history"
 
 st.write(f"Data source: Yahoo Finance as of {todays_date}")
-st.markdown(f"Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)")
+st.markdown("Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)")
 
 
 
