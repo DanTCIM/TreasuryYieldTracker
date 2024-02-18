@@ -70,10 +70,4 @@ link3 = "https://finance.yahoo.com/quote/%5ETNX/history"
 link4 = "https://finance.yahoo.com/quote/%5ETYX/history"
 
 st.write(f"Data source: Yahoo Finance as of {todays_date}")
-st.markdown("Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)")
-
-
-
-
-
-
+st.markdown(f"Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)")
