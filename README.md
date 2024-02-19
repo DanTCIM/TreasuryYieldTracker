@@ -12,9 +12,10 @@ Source: [Yahoo Finance](https://finance.yahoo.com/)
 - [^TNX](https://finance.yahoo.com/quote/%5ETNX/history): 10 year Treasury
 - [^TYX](https://finance.yahoo.com/quote/%5ETYX/history): 30 year Treasury
 
-## 2. Example Output
+## 2. Demo App
 
-Please visit the Streamlit web app [https://treasurytracker.streamlit.app/](https://treasurytracker.streamlit.app/) to see the implementation.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]([https://asop-dream.streamlit.app/](https://treasurytracker.streamlit.app/))  
+Please visit the Streamlit web app (https://treasurytracker.streamlit.app/) to see the implementation.
 
 ## 3. Codes
 
