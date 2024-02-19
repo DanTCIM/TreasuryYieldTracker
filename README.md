@@ -14,7 +14,7 @@ Source: [Yahoo Finance](https://finance.yahoo.com/)
 
 ## 2. Demo App
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]([https://asop-dream.streamlit.app/](https://treasurytracker.streamlit.app/))  
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://treasurytracker.streamlit.app/)  
 Please visit the Streamlit web app (https://treasurytracker.streamlit.app/) to see the implementation.
 
 ## 3. Codes
