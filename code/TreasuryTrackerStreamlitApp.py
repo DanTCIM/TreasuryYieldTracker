@@ -49,17 +49,61 @@ max_y_value = melted_df['Yield'].max()
 y_start = np.floor(min_y_value*2)/2
 y_end = np.ceil(max_y_value*2)/2
 
-# Create a common chart object
-chart = alt.Chart(melted_df).mark_line().encode(
-    x='Close Date:T',
-    y=alt.Y('Yield:Q', scale=alt.Scale(domain=[y_start, y_end])), 
-    #y='Yield:Q',
-    color=alt.Color('Ticker:N', sort=output_list),
-    tooltip=['Close Date:T', 'Ticker:N', 'Yield:Q']
+# Make radio button less cramped by adding a space after each label
+labels = [option + ' ' for option in output_list]
+
+input_dropdown = alt.binding_radio(
+    # Add the empty selection which shows all when clicked
+    options=output_list + [None],
+    labels=labels + ['All'],
+    name='Ticker: '
+)
+selection = alt.selection_point(
+    fields=['Ticker'],
+    bind=input_dropdown,
 )
 
+# Basic line chart
+base_chart = alt.Chart(melted_df).mark_line().encode(
+    x='Close Date:T',
+    y=alt.Y('Yield:Q', scale=alt.Scale(domain=[y_start, y_end])),
+    color=alt.Color('Ticker:N', sort=output_list),
+    #tooltip=['Ticker:N', 'Yield:Q']
+).add_params(
+    selection
+).transform_filter(
+    selection
+)
+
+# Add interactive vertical line
+selector = alt.selection_single(
+    encodings=['x'], # Selection based on x-axis (Close Date)
+    on='mouseover',  # Trigger on mouseover
+    nearest=True,    # Select the value nearest to the mouse cursor
+    empty='none'     # Don't show anything when not mousing over the chart
+)
+
+rule = alt.Chart(melted_df).mark_rule().encode(
+    x='Close Date:T',
+    opacity=alt.condition(selector, alt.value(1), alt.value(0)),
+    color=alt.value('gray'),
+).add_selection(
+    selector
+)
+
+# Add text annotations for Ticker and Yield at intersection
+# This step might require adjusting depending on your DataFrame's structure
+text = base_chart.mark_text(align='left', dx=5, dy=-10, fontWeight ='bold', fontSize = 15).encode(
+    text=alt.condition(selector, 'Yield:Q', alt.value(' '), format='.2f')
+).transform_filter(
+    selector
+)
+
+# Combine the charts
+final_chart = alt.layer(base_chart, rule, text)
+
 # Draw a chart
-st.altair_chart(chart, 
+st.altair_chart(final_chart, 
                 theme=None, 
                 #theme="streamlit", 
                 use_container_width=True)
