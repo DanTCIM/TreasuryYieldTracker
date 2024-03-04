@@ -110,8 +110,25 @@ text = (
     .transform_filter(selector)
 )
 
+# Assuming 'melted_df' has a 'Close Date' column in datetime format
+start_date = melted_df["Close Date"].min()
+end_date = melted_df["Close Date"].max()
+
+# Generate quarter start dates within the range of your data
+quarter_starts = pd.date_range(start=start_date, end=end_date, freq="QS").to_series()
+quarter_starts_df = pd.DataFrame({"Close Date": quarter_starts})
+
+# Chart for bold vertical lines at each quarter start
+quarter_lines = (
+    alt.Chart(quarter_starts_df)
+    .mark_rule(
+        color="gray", strokeWidth=1
+    )  # Bold vertical lines, adjust color/strokeWidth as needed
+    .encode(x="Close Date:T")
+)
+
 # Combine the charts
-final_chart = alt.layer(base_chart, rule, text)
+final_chart = alt.layer(base_chart, rule, text, quarter_lines)
 
 # Draw a chart
 st.altair_chart(
