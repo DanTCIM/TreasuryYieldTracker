@@ -3,4 +3,6 @@ pandas
 yfinance
 langchain
 langchain-experimental
+langchain-community
 openai
+tabulate
