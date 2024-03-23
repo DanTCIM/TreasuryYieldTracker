@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
 # # Treasury Yield Tracker
 # ## Requirements and Import
 import streamlit as st
@@ -7,8 +5,14 @@ import altair as alt
 import yfinance as yf
 import pandas as pd
 import numpy as np
+from langchain.agents import AgentType
+from langchain_experimental.agents import create_pandas_dataframe_agent
+from langchain.callbacks import StreamlitCallbackHandler
+from langchain.chat_models import ChatOpenAI
+import os
 
 # Streamlit application starts here
+st.set_page_config(page_title="Treasury Yield Tracker", page_icon="📈")
 st.title("Treasury Yield Tracker")
 # Example of including a link in Streamlit
 link = "https://github.com/DanTCIM/TreasuryYieldTracker.git"
@@ -142,20 +146,55 @@ st.altair_chart(
 month_end_data = df.resample("ME").last()
 month_end_data.set_index("Close Date", inplace=True)
 
-# Show the filtered DataFrame
-# Displaying a table
-st.subheader("Month-End Data Table")
-st.dataframe(month_end_data[output_list])  # Display the DataFrame as a table
 
-# Source
-todays_date = df["Close Date"].iloc[-1]
+with st.sidebar:
+    # Show the filtered DataFrame
+    # Displaying a table
+    st.subheader("Month-End Data Table")
+    st.dataframe(month_end_data[output_list])  # Display the DataFrame as a table
 
-link1 = "https://finance.yahoo.com/quote/%5EIRX/history"
-link2 = "https://finance.yahoo.com/quote/%5EFVX/history"
-link3 = "https://finance.yahoo.com/quote/%5ETNX/history"
-link4 = "https://finance.yahoo.com/quote/%5ETYX/history"
+    # Source
+    todays_date = df["Close Date"].iloc[-1]
 
-st.write(f"Data source: Yahoo Finance as of {todays_date}")
-st.write(
-    f"Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)"
-)
+    link1 = "https://finance.yahoo.com/quote/%5EIRX/history"
+    link2 = "https://finance.yahoo.com/quote/%5EFVX/history"
+    link3 = "https://finance.yahoo.com/quote/%5ETNX/history"
+    link4 = "https://finance.yahoo.com/quote/%5ETYX/history"
+
+    st.write(f"Data source: Yahoo Finance as of {todays_date}")
+    st.write(
+        f"Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)"
+    )
+
+## LLM process
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+
+if "messages" not in st.session_state or st.sidebar.button(
+    "Clear conversation history"
+):
+    st.session_state["messages"] = [
+        {"role": "assistant", "content": "Welcome to Treasury Yield Tracker!"}
+    ]
+
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
+
+if prompt := st.chat_input(placeholder="Ask questions on the interest rate data."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
+
+    llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", streaming=True)
+
+    pandas_df_agent = create_pandas_dataframe_agent(
+        llm,
+        df,
+        verbose=True,
+        agent_type=AgentType.OPENAI_FUNCTIONS,
+        handle_parsing_errors=True,
+    )
+
+    with st.chat_message("assistant"):
+        st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
+        response = pandas_df_agent.run(st.session_state.messages, callbacks=[st_cb])
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.write(response)

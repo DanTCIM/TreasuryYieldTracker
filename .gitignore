@@ -9,6 +9,9 @@ __pycache__/
 # Mac File
 .DS_Store
 
+# secretes
+secrets.toml
+
 # Distribution / packaging
 .Python
 build/
