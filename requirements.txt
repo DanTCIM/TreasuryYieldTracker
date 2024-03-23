@@ -3,3 +3,4 @@ pandas
 yfinance
 langchain
 langchain-experimental
+openai
