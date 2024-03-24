@@ -6,3 +6,4 @@ langchain-experimental
 langchain-community
 openai
 tabulate
+matplotlib
