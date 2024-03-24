@@ -14,12 +14,7 @@ import os
 # Streamlit application starts here
 st.set_page_config(page_title="Treasury Yield Tracker", page_icon="📈")
 st.title("Treasury Yield Tracker")
-# Example of including a link in Streamlit
-link = "https://github.com/DanTCIM/TreasuryYieldTracker.git"
 st.write("Here is a simple way to monitor the market interest rate.")
-st.markdown(
-    f"You can find the code and the documentation of the project in [GitHub]({link})."
-)
 
 # ## Download Treasury rate data
 treasury_rate_data = yf.download(
@@ -164,6 +159,10 @@ with st.sidebar:
     st.write(f"Data source: Yahoo Finance as of {todays_date}")
     st.write(
         f"Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)"
+    )
+    link = "https://github.com/DanTCIM/TreasuryYieldTracker.git"
+    st.markdown(
+        f"You can find the code and the documentation of the project in [GitHub]({link})."
     )
 
 ## LLM process
