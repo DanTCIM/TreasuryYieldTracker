@@ -182,7 +182,7 @@ if prompt := st.chat_input(placeholder="Ask questions on the interest rate data.
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
-    llm = ChatOpenAI(temperature=0, model="gpt-4-turbo", streaming=True)
+    llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", streaming=True)
 
     pandas_df_agent = create_pandas_dataframe_agent(
         llm,
