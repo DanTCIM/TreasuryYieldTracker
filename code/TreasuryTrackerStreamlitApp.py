@@ -20,7 +20,7 @@ st.write("Here is a simple way to monitor the market interest rate.")
 treasury_rate_data = yf.download(
     "^IRX ^FVX ^TNX ^TYX", start="2022-09-29", end=None
 )  # , interval="1mo")
-df = treasury_rate_data["Adj Close"]
+df = treasury_rate_data["Close"]
 
 # Convert the data
 # Add Close Date information
