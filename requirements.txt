@@ -1,6 +1,7 @@
 streamlit
 pandas
-yfinance
+#yfinance
+yfinance==0.2.51
 langchain
 langchain-experimental
 langchain-community
