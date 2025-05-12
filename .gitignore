@@ -9,6 +9,10 @@ __pycache__/
 # Mac File
 .DS_Store
 
+# Draft files
+*XXX*
+*xxx*
+
 # secretes
 secrets.toml
 

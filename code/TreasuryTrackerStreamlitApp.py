@@ -2,57 +2,57 @@
 # ## Requirements and Import
 import streamlit as st
 import altair as alt
-import yfinance as yf
 import pandas as pd
 import numpy as np
-from langchain.agents import AgentType
+from fredapi import Fred
 from langchain_experimental.agents import create_pandas_dataframe_agent
 from langchain.callbacks import StreamlitCallbackHandler
 from langchain.chat_models import ChatOpenAI
 import os
+
+# Load FRED API key
+fred = Fred(api_key=st.secrets["FRED_API_KEY"])
 
 # Streamlit application starts here
 st.set_page_config(page_title="Treasury Yield Tracker", page_icon="📈")
 st.title("Treasury Yield Tracker")
 st.write("Here is a simple way to monitor the market interest rate.")
 
-# ## Download Treasury rate data
-treasury_rate_data = yf.download(
-    "^IRX ^FVX ^TNX ^TYX", start="2022-09-29", end=None
-)  # , interval="1mo")
-df = treasury_rate_data["Close"]
 
-# Convert the data
-# Add Close Date information
-df = df.copy()
-df["Close Date"] = df.index.strftime("%Y-%m-%d")
-
-# Rename column names
-new_column_names = {
-    "^IRX": "13-week T-Bill",
-    "^FVX": "5-yr Treasury",
-    "^TNX": "10-yr Treasury",
-    "^TYX": "30-yr Treasury",
+# Define series
+series_ids = {
+    "3 Month": "DGS3MO",
+    "5 Year": "DGS5",
+    "10 Year": "DGS10",
+    "30 Year": "DGS30",
 }
 
-df = df.rename(columns=new_column_names)
+# Download from FRED
+df_list = []
+for label, code in series_ids.items():
+    series = fred.get_series(code)
+    df_list.append(series.rename(label).to_frame())
+
+combined_df = pd.concat(df_list, axis=1)
+combined_df.index.name = "Date"
+combined_df = combined_df.dropna(how="all").reset_index()
 
 # Output columns
-output_list = ["13-week T-Bill", "5-yr Treasury", "10-yr Treasury", "30-yr Treasury"]
+output_list = list(series_ids.keys())
 
 # ## Visualize the data
 
 # Plotting the data with Streamlit
-# Melt the DataFrame to convert it to long format
-melted_df = df.melt(id_vars="Close Date", var_name="Ticker", value_name="Yield")
+# Melt for plotting
+melted_df = combined_df.melt(id_vars="Date", var_name="Ticker", value_name="Yield")
+melted_df.dropna(subset=["Yield"], inplace=True)
 
-# Define range:
-# Determine the minimum and maximum values of 'Yield'
-min_y_value = melted_df["Yield"].min()
-max_y_value = melted_df["Yield"].max()
-# Calculate the starting and end points for the Y-axis range
-y_start = np.floor(min_y_value * 2) / 2
-y_end = np.ceil(max_y_value * 2) / 2
+# Filter data to only keep records from September 2022 onwards
+melted_df = melted_df[melted_df["Date"] >= "2022-09-01"]
+
+# Y-axis bounds
+y_start = np.floor(melted_df["Yield"].min() * 2) / 2
+y_end = np.ceil(melted_df["Yield"].max() * 2) / 2
 
 # Make radio button less cramped by adding a space after each label
 labels = [option + " " for option in output_list]
@@ -73,7 +73,7 @@ base_chart = (
     alt.Chart(melted_df)
     .mark_line()
     .encode(
-        x="Close Date:T",
+        x="Date:T",
         y=alt.Y("Yield:Q", scale=alt.Scale(domain=[y_start, y_end])),
         color=alt.Color("Ticker:N", sort=output_list),
         # tooltip=['Ticker:N', 'Yield:Q']
@@ -94,7 +94,7 @@ rule = (
     alt.Chart(melted_df)
     .mark_rule()
     .encode(
-        x="Close Date:T",
+        x="Date:T",
         opacity=alt.condition(selector, alt.value(1), alt.value(0)),
         color=alt.value("gray"),
     )
@@ -110,12 +110,12 @@ text = (
 )
 
 # Assuming 'melted_df' has a 'Close Date' column in datetime format
-start_date = melted_df["Close Date"].min()
-end_date = melted_df["Close Date"].max()
+start_date = melted_df["Date"].min()  # error code
+end_date = melted_df["Date"].max()  # error code
 
 # Generate quarter start dates within the range of your data
 quarter_starts = pd.date_range(start=start_date, end=end_date, freq="QS").to_series()
-quarter_starts_df = pd.DataFrame({"Close Date": quarter_starts})
+quarter_starts_df = pd.DataFrame({"Date": quarter_starts})
 
 # Chart for bold vertical lines at each quarter start
 quarter_lines = (
@@ -123,7 +123,7 @@ quarter_lines = (
     .mark_rule(
         color="gray", strokeWidth=1
     )  # Bold vertical lines, adjust color/strokeWidth as needed
-    .encode(x="Close Date:T")
+    .encode(x="Date:T")
 )
 
 # Combine the charts
@@ -138,34 +138,43 @@ st.altair_chart(
 )
 
 # Filter for month ends
-month_end_data = df.resample("ME").last()
-month_end_data.set_index("Close Date", inplace=True)
+# month_end_data = df.resample("ME").last()
+# month_end_data.set_index("Close Date", inplace=True)
+combined_df["Date"] = pd.to_datetime(combined_df["Date"])
+
+# Sort just in case
+combined_df = combined_df.sort_values("Date")
+
+# Group by year and month, then get last available row per group
+combined_df["YearMonth"] = combined_df["Date"].dt.to_period("M")
+month_end_data = combined_df.groupby("YearMonth").last().reset_index(drop=True)
+
+# Filter from 2022 onwards
+month_end_data = month_end_data[month_end_data["Date"] >= "2022-01-01"]
+month_end_data = month_end_data.set_index("Date")
+month_end_data.index = month_end_data.index.strftime("%Y-%m-%d")
+
+# month_end_data = combined_df.set_index("Date").resample("M").last()
+# month_end_data = month_end_data[month_end_data.index >= pd.to_datetime("2022-01-01")]
+# month_end_data = month_end_data.set_index("Close Date")
 
 
 with st.sidebar:
-    # Show the filtered DataFrame
-    # Displaying a table
     st.subheader("Month-End Data Table")
-    st.dataframe(month_end_data[output_list])  # Display the DataFrame as a table
+    st.dataframe(month_end_data[output_list])
 
-    # Source
-    todays_date = df["Close Date"].iloc[-1]
+    todays_date = combined_df["Date"].max().strftime("%Y-%m-%d")
+    st.write(f"Data source: FRED as of {todays_date}")
+    st.markdown("[FRED Treasury Rates](https://fred.stlouisfed.org/categories/115)")
 
-    link1 = "https://finance.yahoo.com/quote/%5EIRX/history"
-    link2 = "https://finance.yahoo.com/quote/%5EFVX/history"
-    link3 = "https://finance.yahoo.com/quote/%5ETNX/history"
-    link4 = "https://finance.yahoo.com/quote/%5ETYX/history"
-
-    st.write(f"Data source: Yahoo Finance as of {todays_date}")
-    st.write(
-        f"Adjusted Close from Tickers: [^IRX]({link1}) (13-week T-Bill), [^FVX]({link2}) (5-yr Treasury), [^TNX]({link3}) (10-yr Treasury), [^TYX]({link4}) (30-yr Treasury)"
-    )
-    link = "https://github.com/DanTCIM/TreasuryYieldTracker.git"
     st.markdown(
-        f"You can find the code and the documentation of the project in [GitHub]({link})."
+        """
+        You can find the code and the documentation of the project in 
+        [GitHub](https://github.com/DanTCIM/TreasuryYieldTracker.git).
+    """
     )
 
-## LLM process
+# LLM section
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 if "messages" not in st.session_state or st.sidebar.button(
@@ -182,14 +191,12 @@ if prompt := st.chat_input(placeholder="Ask questions on the interest rate data.
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
-    llm = ChatOpenAI(temperature=0, model="gpt-4o", streaming=True)  # gpt-3.5-turbo
-
+    llm = ChatOpenAI(temperature=0, model="gpt-4o", streaming=True)
     pandas_df_agent = create_pandas_dataframe_agent(
         llm,
-        df,
+        combined_df,
         verbose=True,
-        agent_type="openai-tools",  # AgentType.OPENAI_FUNCTIONS,
-        # handle_parsing_errors=True,
+        agent_type="openai-tools",
         allow_dangerous_code=True,
     )
 
