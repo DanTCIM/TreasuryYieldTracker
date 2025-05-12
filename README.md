@@ -1,16 +1,20 @@
 # Treasury Yield Tracker
 ## 1. Description of the Project
-Track 5-, 10-, 30-yr Treasury Yields and 13-week T-Bill using Yahoo Finance Data
 
-The project automates the process of downloading Treasury rate data and displays the past interest rate since year-end 2022.  
-It consists of sections for installing necessary libraries such as pandas, matplotlib, and yfinance, downloading the Treasury rate data using yfinance, preprocessing the data for visualization, and creating a line plot to visualize the data.
+The **Treasury Yield Tracker** is a Streamlit web application that allows users to visualize historical Treasury yield data using the [FRED (Federal Reserve Economic Data)](https://fred.stlouisfed.org/) API.
 
-A user can adjust and edit the source tickers to monitor any market data from Yahoo Finance.
-Source: [Yahoo Finance](https://finance.yahoo.com/)
-- [^IRX](https://finance.yahoo.com/quote/%5EIRX/history): 13 week T-Bill
-- [^FVX](https://finance.yahoo.com/quote/%5EFVX/history): 5 year Treasury
-- [^TNX](https://finance.yahoo.com/quote/%5ETNX/history): 10 year Treasury
-- [^TYX](https://finance.yahoo.com/quote/%5ETYX/history): 30 year Treasury
+The project automates:
+- Downloading and aggregating market interest rates (3M, 5Y, 10Y, 30Y)
+- Displaying clean, interactive charts using Altair
+- Providing a business-friendly view with monthly data sampled at the **last available business day** of each month since 2022
+- Optional integration with an LLM agent to ask natural language questions about the data
+
+### Key Features
+- Clean and responsive Streamlit UI
+- Interactive radio filter for yield term selection
+- Sidebar table with latest month-end yield values
+- Automatic detection of most recent FRED update
+- LangChain + OpenAI-powered chat for data exploration
 
 ## 2. Demo App
 
@@ -36,5 +40,5 @@ Dan Kim
 This project is licensed under the Apache License 2.0- see the LICENSE.md file for details.
 
 ## 7. References
-- https://finance.yahoo.com/
-- https://treasurytracker.streamlit.app/
+- [FRED: Federal Reserve Economic Data](https://fred.stlouisfed.org/)
+- [Altair: Declarative Visualization in Python](https://altair-viz.github.io/)
